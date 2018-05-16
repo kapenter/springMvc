@@ -1,0 +1,113 @@
+group 'com.person'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: "maven-publish"
+apply plugin: 'war'
+
+sourceCompatibility = 1.8
+
+repositories {
+    maven {
+        url "http://192.168.0.112:8081/nexus/content/groups/public/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.springframework:spring-aop:4.3.9.RELEASE'
+    compile 'org.springframework:spring-context:4.3.9.RELEASE'
+    compile 'org.springframework:spring-beans:4.3.9.RELEASE'
+    compile 'org.springframework:spring-web:4.3.9.RELEASE'
+    compile 'org.springframework:spring-webmvc:4.3.9.RELEASE'
+    compile 'org.springframework:spring-tx:4.3.9.RELEASE'
+    compile 'org.springframework:spring-jdbc:4.3.9.RELEASE'
+    compile 'org.springframework:spring-test:4.3.9.RELEASE'
+
+
+
+    // https://mvnrepository.com/artifact/com.alibaba/dubbo
+    compile (group: 'com.alibaba', name: 'dubbo', version: '2.5.3'){
+        exclude group:'org.springframework', module: 'spring'
+    }
+
+    // https://mvnrepository.com/artifact/com.github.sgroschupf/zkclient
+    compile group: 'com.github.sgroschupf', name: 'zkclient', version: '0.1'
+
+
+    // https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper
+    compile group: 'org.apache.zookeeper', name: 'zookeeper', version: '3.4.6', ext: 'pom'
+
+
+    // https://mvnrepository.com/artifact/org.apache.activemq/activemq-all
+    compile group: 'org.apache.activemq', name: 'activemq-all', version: '5.13.4'
+
+            //设置动态属性
+    ext {
+        //发布到仓库用户名
+        publishUserName = "admin"
+        //发布到仓库地址
+        publishUserPassword = "admin123"
+        //仓库地址
+        publishURL="http://192.168.0.112:8081/nexus/content/repositories/snapshots/"
+
+        apiBaseJarName = "com.person.zhou"
+        apiBaseJarVersion = '1.1.insevent-SNAPSHOT'
+        builtBy="gradle 1.9"
+    }
+//jar包名称组成：[baseName]-[appendix]-[version]-[classifier].[extension]
+//打包class文件
+    task apiBaseJar(type:Jar){
+        println 'Hello world1111!'
+        version apiBaseJarVersion
+        baseName apiBaseJarName
+        from sourceSets.main.output
+        destinationDir file("$buildDir/api-libs")
+        includes ['com/person/service/**']
+        manifest {
+            attributes 'packageName': apiBaseJarName, 'Built-By': builtBy,'Built-date': new Date().format('yyyy-MM-dd HH:mm:ss'),'Manifest-Version':version
+        }
+    }
+//打包源码
+    task apiBaseSourceJar(type:Jar){
+        println 'Hello world2222!'
+        version apiBaseJarVersion
+        baseName apiBaseJarName
+        classifier "sources"
+        from sourceSets.main.allSource
+        destinationDir file("$buildDir/api-libs")
+        includes ['com/person/service/**']
+        println 'A message which is logged at QUIET level'
+        manifest {
+            attributes 'packageName': apiBaseJarName+'-sources', 'Built-By': builtBy,'Built-date': new Date().format('yyyy-MM-dd HH:mm:ss'),'Manifest-Version':version
+        }
+    }
+    //上传jar包
+    publishing {
+        println 'Hello world3333!'
+        publications {
+            publishing.publications.create('apiBase', MavenPublication) {
+                groupId 'com.person'
+                artifactId apiBaseJarName
+                version apiBaseJarVersion
+                //同时上传class包和源码包
+                println 'Hello world44444!'
+                artifacts = [apiBaseJar, apiBaseSourceJar]
+            }
+        }
+        repositories {
+            maven {
+                url publishURL
+                credentials {
+                    username = publishUserName
+                    password = publishUserPassword
+                }
+            }
+        }
+
+    }
+
+
+
+
+}
