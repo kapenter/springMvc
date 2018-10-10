@@ -9,7 +9,7 @@ public class JMSConsumer {
     private static final  String USERNAME= ActiveMQConnection.DEFAULT_USER;
     private static final  String PASSWORD=ActiveMQConnection.DEFAULT_PASSWORD;
     //private static final  String BROKERURL=ActiveMQConnection.DEFAULT_BROKER_URL;
-    private static final  String BROKERURL="tcp://192.168.0.106:61616";
+    private static final  String BROKERURL="tcp://192.168.0.106:61616"  ;
 
 
 

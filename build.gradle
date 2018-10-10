@@ -9,7 +9,7 @@ sourceCompatibility = 1.8
 
 repositories {
     maven {
-        url "http://192.168.0.112:8081/nexus/content/groups/public/"
+        url "http://tech.xiaoniu88.net/nexus/content/groups/public/"
     }
     mavenCentral()
 }
